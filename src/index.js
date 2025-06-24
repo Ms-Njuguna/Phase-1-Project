@@ -63,6 +63,7 @@ function displayProducts(products) {
             <button id= "buyNow-Button">Buy Now</button>
         `
         displaySection.appendChild(productCard);
+        productCard.addEventListener('mouseover', showProductDescription)
     })
 }
 
@@ -74,4 +75,8 @@ function showLoadingMessage() {
             <p>Please wait while we load the products for you...</p>
         </div>
     `;
+}
+
+function showProductDescription() {
+    console.log('The mouse is over a product card');
 }
