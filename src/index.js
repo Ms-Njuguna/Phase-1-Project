@@ -40,6 +40,8 @@ function displayProducts(products) {
         const productCard = document.createElement('div');
         productCard.className = 'product-card'
 
+        productCard.dataset.description = product.description
+
         const colorDropdown = product.product_colors.length > 0
         ? `
             <label for="colorSelect-${product.id}">Shades:</label>
@@ -53,17 +55,28 @@ function displayProducts(products) {
         `
         : '<p>No shades available</p>';
 
-        productCard.innerHTML = `
-            <img src= "${product.image_link}" alt= "${product.name}" loading="lazy" onerror="this.onerror=null; this.src='https://i.pinimg.com/736x/61/8b/81/618b817cb28017dd9f174687f3987138.jpg';">
+        const originalHTML = `
+            <img src= "${product.image_link}" alt= "${product.name}" loading="lazy"
+                onerror="this.onerror=null; this.src='https://i.pinimg.com/736x/61/8b/81/618b817cb28017dd9f174687f3987138.jpg';">
             <div id="product-Details">
                 <p>${product.name}</p>
                 <p>${product.price_sign} ${product.price}</p>
             </div>
             <div id="color-Dropdown">${colorDropdown}</div>
             <button id= "buyNow-Button">Buy Now</button>
-        `
+        `;
+
+        productCard.innerHTML = originalHTML;
+
+        // Add hover event
+        productCard.addEventListener('mouseenter', () => {
+            productCard.innerHTML = `<p style="padding: 1rem; font-size: 14px;" id = "product-Description">${product.description || 'No description available'}</p>`;
+        });
+
+        productCard.addEventListener('mouseleave', () => {
+            productCard.innerHTML = originalHTML;
+        });
         displaySection.appendChild(productCard);
-        productCard.addEventListener('mouseover', showProductDescription)
     })
 }
 
@@ -75,8 +88,4 @@ function showLoadingMessage() {
             <p>Please wait while we load the products for you...</p>
         </div>
     `;
-}
-
-function showProductDescription() {
-    console.log('The mouse is over a product card');
 }
