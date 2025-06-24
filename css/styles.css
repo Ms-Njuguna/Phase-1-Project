@@ -1,11 +1,15 @@
 
-html {
-  scroll-behavior: smooth;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
-body {
-    box-sizing: border-box;
-    background-color: #f7f8fb;
+body > main {
+  flex: 1;
 }
 
 header nav {
@@ -51,6 +55,9 @@ header #hero-section #header-model-image {
 }
 
 footer #footer-info {
+    margin-top: auto;
+    padding: 0;
+    flex-shrink: 0;
     background-color: black;
     color: #f7f8fb;
     display: flex;
@@ -60,7 +67,7 @@ footer #footer-info {
 }
 
 footer #footer-info #footer-logo {
-    height: 100px;
+    height: 80px;
     width: 150px;
     align-self: center;
 }
@@ -113,4 +120,67 @@ footer #footer-info #copyright-section {
 .product-card #color-Dropdown {
     border-radius: 7px;
     border-color: black;
+}
+
+#brands-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#brands-list h3 {
+    font-size: 2.0rem;
+    font-weight: bolder;
+    margin-top: 30px;
+}
+
+#brands-list #brand-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+#brands-list #brand-buttons .brand-Button {
+    border-radius: 7px;
+    padding: 5px 10px;
+    background-color: black;
+    color: #f7f8fb;
+}
+
+#buyNow-Button {
+    border-radius: 7px;
+    border: 1px solid black;
+    padding: 5px 10px;
+    align-self: center;
+    margin-top: 10px;
+}
+
+.spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: sans-serif;
+  color: #555;
+  margin: 40px auto;
+}
+
+.spinner-circle {
+  border: 6px solid #eee;
+  border-top: 6px solid black;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
