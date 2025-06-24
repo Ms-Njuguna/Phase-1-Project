@@ -41,13 +41,14 @@ function displayProducts() {
 
 
                     const productCard = document.createElement('div');
+                    productCard.className = 'product-card'
                     productCard.innerHTML = `
                         <img src= "${product.image_link}" alt= "${product.name}">
-                        <div>
+                        <div id="product-Details">
                             <p>${product.name}</p>
                             <p>${product.price_sign} ${product.price}</p>
                         </div>
-                        <div>${colorDropdown}</div>
+                        <div id="color-Dropdown">${colorDropdown}</div>
                     `
                     displaySection.appendChild(productCard);
                 }
