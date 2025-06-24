@@ -40,8 +40,6 @@ function displayProducts(products) {
         const productCard = document.createElement('div');
         productCard.className = 'product-card'
 
-        productCard.dataset.description = product.description
-
         const colorDropdown = product.product_colors.length > 0
         ? `
             <label for="colorSelect-${product.id}">Shades:</label>
@@ -55,28 +53,43 @@ function displayProducts(products) {
         `
         : '<p>No shades available</p>';
 
-        const originalHTML = `
-            <img src= "${product.image_link}" alt= "${product.name}" loading="lazy"
-                onerror="this.onerror=null; this.src='https://i.pinimg.com/736x/61/8b/81/618b817cb28017dd9f174687f3987138.jpg';">
+        const imageAndDescription = `
+            <div class="image-wrapper">
+                <img src="${product.image_link}" alt="${product.name}" class= "product-image" loading="lazy"
+                   onerror="this.onerror=null; this.src='https://i.pinimg.com/736x/61/8b/81/618b817cb28017dd9f174687f3987138.jpg';">
+               <div class="image-description hidden">
+                   <p>${product.description || 'No description available.'}</p>
+               </div>
+           </div>
+        `;
+
+
+        productCard.innerHTML = `
+            ${imageAndDescription}
             <div id="product-Details">
                 <p>${product.name}</p>
                 <p>${product.price_sign} ${product.price}</p>
             </div>
             <div id="color-Dropdown">${colorDropdown}</div>
-            <button id= "buyNow-Button">Buy Now</button>
-        `;
-
-        productCard.innerHTML = originalHTML;
-
-        // Add hover event
-        productCard.addEventListener('mouseenter', () => {
-            productCard.innerHTML = `<p style="padding: 1rem; font-size: 14px;" id = "product-Description">${product.description || 'No description available'}</p>`;
-        });
-
-        productCard.addEventListener('mouseleave', () => {
-            productCard.innerHTML = originalHTML;
-        });
+            <button id= "buyNow-Button">Buy Now</button> 
+        `
         displaySection.appendChild(productCard);
+
+        const productDescription = productCard.querySelector('.image-description')
+        const productImage = productCard.querySelector('.product-image')
+
+
+        productCard.querySelector('.image-wrapper').addEventListener('mouseenter', () => {
+            productImage.style.opacity = '0';
+            productDescription.classList.remove('hidden');
+            productDescription.classList.add('show');
+        })
+
+        productCard.querySelector('.image-wrapper').addEventListener('mouseleave',  () => {
+            productImage.style.opacity = '1';
+            productDescription.classList.remove('show');
+            productDescription.classList.add('hidden');
+        })
     })
 }
 
@@ -88,4 +101,20 @@ function showLoadingMessage() {
             <p>Please wait while we load the products for you...</p>
         </div>
     `;
+}
+
+function showProductDescription() {
+    document.querySelectorAll('.product-card').forEach((card) => {
+        const originalHTML = card.innerHTML;
+        const description = card.dataset.description;
+        console.log(description)
+
+        card.addEventListener('mouseenter', () => {
+            card.innerHTML = `<p>${description}</p>`
+        })
+
+        card.addEventListener('mouseleave', () => {
+            card.innerHTML = originalHTML;
+        })
+    })
 }
