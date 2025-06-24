@@ -63,12 +63,15 @@ function displayProducts(products) {
            </div>
         `;
 
+        const priceNumber = Number(product.price);
+        const price = priceNumber.toFixed(2);
+
 
         productCard.innerHTML = `
             ${imageAndDescription}
             <div id="product-Details">
                 <p>${product.name}</p>
-                <p>${product.price_sign} ${product.price}</p>
+                <p>${product.price_sign} ${price}</p>
             </div>
             <div id="color-Dropdown">${colorDropdown}</div>
             <button id= "buyNow-Button">Buy Now</button> 
