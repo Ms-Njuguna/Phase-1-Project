@@ -184,3 +184,11 @@ footer #footer-info #copyright-section {
     transform: rotate(360deg);
   }
 }
+
+#product-Description {
+    background-color: grey;
+    border-radius: 7px;
+    color: #f7f8fb;
+    align-self: center;
+    height: fit-content;
+}
