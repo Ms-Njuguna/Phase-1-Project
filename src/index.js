@@ -42,18 +42,32 @@ function displayProducts(products) {
         const productCard = document.createElement('div');
         productCard.className = 'product-card'
 
-        const colorDropdown = product.product_colors.length > 0
-        ? `
-            <label for="colorSelect-${product.id}">Shades:</label>
-            <select id="colorSelect-${product.id}">
-                ${product.product_colors.map(color => `
-                    <option value="${color.hex_value}">
-                        ${color.colour_name || 'Unnamed color'}
-                    </option>
-                `).join('')}
-            </select>
-        `
-        : '<p>No shades available</p>';
+        let colorDropdownHTML = '';
+        let isOutOfStock = false;
+        let price = '0.00';
+
+        const validColors = product.product_colors.filter(
+            color => color.colour_name && color.colour_name.toLowerCase() !== 'unnamed'
+        );
+
+        if (validColors.length > 0) {
+            price = Number(product.price).toFixed(2);
+            colorDropdownHTML = `
+                <label for="colorSelect-${product.id}">Shades:</label>
+                <select id="colorSelect-${product.id}">
+                    ${validColors.map(color => `
+                       <option value="${color.hex_value}">
+                           ${color.colour_name}
+                        </option>
+                    `).join('')}
+                </select>
+            `;
+        } else {
+            colorDropdownHTML = '<p>No shades available</p>';
+            isOutOfStock = true;
+        }
+
+
 
         const imageAndDescription = `
             <div class="image-wrapper">
@@ -65,18 +79,26 @@ function displayProducts(products) {
            </div>
         `;
 
-        const priceNumber = Number(product.price);
-        const price = priceNumber.toFixed(2);
-
+        // const priceNumber = Number(product.price);
 
         productCard.innerHTML = `
             ${imageAndDescription}
             <div id="product-Details">
                 <p>${product.name}</p>
-                <p>$ ${price}</p>
+                <p class="product-price">${isOutOfStock ? 'Out of stock' : `$ ${price}`}</p>
             </div>
-            <div id="color-Dropdown">${colorDropdown}</div>
-            <button id= "buyNow-Button">Buy Now</button> 
+            <div class="shade-container">
+                ${validColors.map(color => `
+                   <span class="shade" 
+                   style="background-color:${color.hex_value}" 
+                   title="${color.colour_name}">
+                   </span>
+                `).join('')}
+                ${colorDropdownHTML}
+            </div>
+            <button id="buyNow-Button" ${isOutOfStock ? 'disabled class="inactive"' : ''}>
+                ${isOutOfStock ? 'Unavailable' : 'Buy Now'}
+            </button>
         `
         displaySection.appendChild(productCard);
 
@@ -105,7 +127,7 @@ function displayProducts(products) {
             handleOrderSummary(product, selectedShade)
         })
     })
-    
+
     const brandHeading = document.getElementById('brand-heading');
     if (brandHeading.classList.contains('hidden')) {
         brandHeading.classList.remove('hidden');

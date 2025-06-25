@@ -97,7 +97,19 @@ footer #footer-info #copyright-section {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 15px;
     text-align: center;
+    overflow: hidden;
 }
+
+select {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#color-Dropdown {
+    overflow-x: auto;
+}
+
 
 .product-card img {
     border-radius: 7px;
@@ -367,4 +379,11 @@ td {
   font-size: 0.75rem;
   font-weight: normal;
   color: rgb(255, 162, 162);
+}
+
+button.inactive {
+  opacity: 0.5;
+  pointer-events: none;
+  background-color: #ccc;
+  cursor: not-allowed;
 }
