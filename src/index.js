@@ -1,22 +1,29 @@
+//A web app that allows a user to see products by brand and order them a per shade preference
+//make sure that all DOM content is loaded before any function is run
 document.addEventListener('DOMContentLoaded', () => {
     displayBrands();
     createTotalRow();
     handleOrderSubmit();
 })
 
+//displays make-up brands
 function displayBrands () {
     const BASE_URL = "http://makeup-api.herokuapp.com/api/v1/products.json";
     const brandButtons = document.querySelector('#brand-buttons');
     const selectedBrands = ['fenty', 'maybelline', 'marcelle', 'e.l.f.', 'clinique', 'glossier', 'l\'oreal'];
 
+    //shows loading message as products are fetched
     showLoadingMessage();
 
+    //fetches products from public API
     fetch(`${BASE_URL}`)
     .then(res => res.json())
     .then(products => {
+        //filters through all products and return new set with specific chosen brands
         const selectedProducts = products.filter(product => selectedBrands.includes(product.brand));
         const uniqueBrands = [...new Set(selectedProducts.map(product => product.brand))];
 
+        //lists product brands 
         uniqueBrands.forEach(brand => {
             const brandButton = document.createElement('button');
             brandButton.innerHTML = brand.toUpperCase();
@@ -27,21 +34,25 @@ function displayBrands () {
             })
             brandButtons.appendChild(brandButton);
         })
+
         //to make sure the first brand on the brand list always displays it's products when the page is refreshed
         displayProducts(selectedProducts.filter(product => product.brand === uniqueBrands[0]));
     })
 }
 
-
+//displays products/product cards for selected brands
 function displayProducts(products) {
     
     const displaySection = document.querySelector('#products-byBrand')
     displaySection.innerHTML = '';
     
+    //shows maximum of 9 products per brand
     products.slice(0, 9).forEach(product => {
         const productCard = document.createElement('div');
         productCard.className = 'product-card'
 
+
+        //checks if colour/shade is unnamed or null and render product out of stock
         let colorDropdownHTML = '';
         let isOutOfStock = false;
         let price = '0.00';
@@ -67,8 +78,7 @@ function displayProducts(products) {
             isOutOfStock = true;
         }
 
-
-
+        //separates image and description for hover effect
         const imageAndDescription = `
             <div class="image-wrapper">
                 <img src="${product.image_link}" alt="${product.name}" class= "product-image" loading="lazy"
@@ -79,6 +89,7 @@ function displayProducts(products) {
            </div>
         `;
 
+        //product card details
         productCard.innerHTML = `
             ${imageAndDescription}
             <div id="product-Details">
@@ -104,6 +115,8 @@ function displayProducts(products) {
         const productImage = productCard.querySelector('.product-image')
 
 
+        //hover effect over image to show product description
+        //uses this instead of hovering over entire card so as to access other features i.e., dropdown and order button
         productCard.querySelector('.image-wrapper').addEventListener('mouseenter', () => {
             productImage.style.opacity = '0';
             productDescription.classList.remove('hidden');
@@ -116,6 +129,7 @@ function displayProducts(products) {
             productDescription.classList.add('hidden');
         })
 
+        //order button to add order to order list/summary later
         const buyNowButton = productCard.querySelector('#buyNow-Button');
         buyNowButton.addEventListener('click', () => {
 
@@ -126,12 +140,14 @@ function displayProducts(products) {
         })
     })
 
+    //to prevent heading from showing before products fully load
     const brandHeading = document.getElementById('brand-heading');
     if (brandHeading.classList.contains('hidden')) {
         brandHeading.classList.remove('hidden');
     }
 }
 
+//shows a loading message with spinning loading circle to retain the user's attention
 function showLoadingMessage() {
     const displaySection = document.querySelector('#products-byBrand');
     displaySection.innerHTML = `
@@ -142,6 +158,7 @@ function showLoadingMessage() {
     `;
 }
 
+//creates tottal row that goes at the end of products ordered table in order summary section
 function createTotalRow() {
     const orderTable = document.querySelector('#ordered-itemsDisplay');
     const orderTotal = document.createElement('tr');
@@ -158,11 +175,12 @@ function createTotalRow() {
     orderTable.appendChild(orderTotal);
 }
 
-
+//handles order summary content
 function handleOrderSummary(product, shade) {
 
     const orderTable = document.querySelector('#ordered-itemsDisplay')
 
+    //makes sure price is always a number with two decimal places
     const productPrice = Number(product.price);
     const price = productPrice.toFixed(2);
 
@@ -182,6 +200,7 @@ function handleOrderSummary(product, shade) {
     orderTable.insertBefore(orderDetailsRow, document.getElementById('order-total-row'));
     handleOrderTotal(price);
 
+    //event listener for removing order from summary of orders
     const removeButton = orderDetailsRow.querySelector('.remove-btn');
     removeButton.addEventListener('click', handleDeleteOrder);
 
@@ -191,10 +210,11 @@ function handleOrderSummary(product, shade) {
     }
 }
 
-
+//handles total price of products ordered
 let allPrices = [];
 function handleOrderTotal(price) {
 
+    //calculates total of all prices of all products ordered
     allPrices.push(Number(price));
     const total = allPrices.reduce((acc, curr) => acc + curr, 0).toFixed(2);
 
@@ -205,6 +225,7 @@ function handleOrderTotal(price) {
     return total;
 }
 
+//handles deletion of order from order summary
 function handleDeleteOrder(e) {
     e.preventDefault();
 
@@ -213,7 +234,7 @@ function handleDeleteOrder(e) {
     const priceText = rowData.querySelector('.price-wrapper span').textContent;
     const priceValue = Number(priceText.replace('$', '').trim());
 
-    // Remove price from allPrices array (first matching one)
+    // Removes price from allPrices array (first matching one)
     const indexToRemove = allPrices.indexOf(priceValue);
     if (indexToRemove !== -1) {
         allPrices.splice(indexToRemove, 1);
@@ -221,10 +242,11 @@ function handleDeleteOrder(e) {
 
     rowData.remove()
 
+    //recalculates order total once product ordered is deleted
     const newTotal = allPrices.reduce((acc, curr) => acc + curr, 0).toFixed(2);
     document.getElementById('total-amount').textContent = `$ ${newTotal}`;
 
-    // Hide form if no items remain
+    // Hides order summary form if all products are deleted
     const orderRows = document.querySelectorAll('tr:not(#order-total-row):not(#table-headers)');
     if (orderRows.length === 0) {
         const orderSummarySection = document.querySelector('#order-summaryDisplay');
@@ -233,18 +255,23 @@ function handleDeleteOrder(e) {
     }
 }
 
+//handles submission of order
 function handleOrderSubmit() {
 
     const submitButton = document.querySelector('#checkout-Button');
     submitButton.addEventListener('click', (e) => {
+        //to prevent default form behaviour
         e.preventDefault();
 
+        //to access user name value entered
         const userName = document.querySelector('#userName').value;
         alert(`${userName}, you have successfully ordered your make-up products!`)
 
+        //resets the order summary form when order is submitted
         const form = document.querySelector('#order-summaryForm'); 
         form.reset();
 
+        //hides the order summary form
         const orderSummarySection = document.querySelector('#order-summaryDisplay');
         orderSummarySection.classList.add('hidden');
 
@@ -253,7 +280,7 @@ function handleOrderSubmit() {
         );
         rows.forEach(row => row.remove());
 
-        // ✅ Reset total and clear prices
+        //Resets total and clear prices
         document.getElementById('total-amount').textContent = '$ 0.00';
         allPrices = [];
     }
