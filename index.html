@@ -32,9 +32,25 @@
                 </div>
                 <div id="products-byBrand"></div>
             </section>
-            <section id="favorites-display">
-                <h3>Favorites</h3>
-                <div id="favorites"></div>
+            <section id="order-summaryDisplay">
+                <form id="order-summaryForm">
+                    <div id="order-summaryFormHeading">
+                        <h3>ORDER SUMMARY</h3>
+                    </div>
+                    <div id="order-summaryFormInputs">
+                        <input type="text" placeholder="Name ..." required>
+                        <input type="text" placeholder="Email ..." required>
+                    </div>
+                    <div>
+                        <table id="ordered-itemsDisplay">
+                            <tr id="table-headers">
+                                <th>Orders</th>
+                                <th>Price</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <button type="submit" id="checkout-Button">Checkout</button>
+                </form>
             </section>
         </main>
         <footer>
