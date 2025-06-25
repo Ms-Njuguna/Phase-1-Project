@@ -98,6 +98,7 @@ function displayProducts(products) {
 
         const buyNowButton = productCard.querySelector('#buyNow-Button');
         buyNowButton.addEventListener('click', () => {
+
             const shadeDropdown = productCard.querySelector(`#colorSelect-${product.id}`);
             const selectedShade = shadeDropdown ? shadeDropdown.options[shadeDropdown.selectedIndex].text : 'No shade';
 
@@ -152,8 +153,14 @@ function handleOrderSummary(product, shade) {
             </div>
         </td>
     `
+
     orderTable.insertBefore(orderDetailsRow, document.getElementById('order-total-row'));
     handleOrderTotal(price);
+
+    const orderSummarySection = document.querySelector('#order-summaryDisplay');
+    if (orderSummarySection.classList.contains('hidden')) {
+        orderSummarySection.classList.remove('hidden');
+    }
 }
 
 
