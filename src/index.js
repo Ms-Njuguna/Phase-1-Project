@@ -1,25 +1,26 @@
 //A web app that allows a user to see products by brand and order them a per shade preference
-//make sure that all DOM content is loaded before any function is run
+//this makes sure that all DOM content is loaded before any function is run
+
 document.addEventListener('DOMContentLoaded', () => {
     displayBrands();
     createTotalRow();
     handleOrderSubmit();
 })
 
-//displays make-up brands
-function displayBrands () {
+//an asynchronous function that displays the make-up brands
+
+async function displayBrands () {
     const BASE_URL = "https://makeup-api.herokuapp.com/api/v1/products.json";
     const brandButtons = document.querySelector('#brand-buttons');
     const selectedBrands = ['fenty', 'maybelline', 'marcelle', 'e.l.f.', 'clinique', 'glossier', 'l\'oreal'];
 
     //shows loading message as products are fetched
-    showLoadingMessage();
+    try {
+        showLoadingMessage();
+        const res = await fetch(BASE_URL);
+        const products = await res.json();
 
-    //fetches products from public API
-    fetch(`${BASE_URL}`)
-    .then(res => res.json())
-    .then(products => {
-        //filters through all products and return new set with specific chosen brands
+        //filters through all products and return new set with specific brands I have chosen
         const selectedProducts = products.filter(product => selectedBrands.includes(product.brand));
         const uniqueBrands = [...new Set(selectedProducts.map(product => product.brand))];
 
@@ -35,12 +36,15 @@ function displayBrands () {
             brandButtons.appendChild(brandButton);
         })
 
-        //to make sure the first brand on the brand list always displays it's products when the page is refreshed
+        //wanted to make sure the first brand on the brand list always displays it's products when the page is refreshed
         displayProducts(selectedProducts.filter(product => product.brand === uniqueBrands[0]));
-    })
+    }catch (error) {
+        console.error("Failed to load products:", error);
+    }
 }
 
 //displays products/product cards for selected brands
+
 function displayProducts(products) {
     
     const displaySection = document.querySelector('#products-byBrand')
@@ -148,6 +152,7 @@ function displayProducts(products) {
 }
 
 //shows a loading message with spinning loading circle to retain the user's attention
+
 function showLoadingMessage() {
     const displaySection = document.querySelector('#products-byBrand');
     displaySection.innerHTML = `
@@ -159,6 +164,7 @@ function showLoadingMessage() {
 }
 
 //creates tottal row that goes at the end of products ordered table in order summary section
+
 function createTotalRow() {
     const orderTable = document.querySelector('#ordered-itemsDisplay');
     const orderTotal = document.createElement('tr');
@@ -175,7 +181,8 @@ function createTotalRow() {
     orderTable.appendChild(orderTotal);
 }
 
-//handles order summary content
+//function handles what is showed in the order summary
+
 function handleOrderSummary(product, shade) {
 
     const orderTable = document.querySelector('#ordered-itemsDisplay')
@@ -210,7 +217,8 @@ function handleOrderSummary(product, shade) {
     }
 }
 
-//handles total price of products ordered
+//this handles the total price of products ordered
+
 let allPrices = [];
 function handleOrderTotal(price) {
 
@@ -225,7 +233,8 @@ function handleOrderTotal(price) {
     return total;
 }
 
-//handles deletion of order from order summary
+//this handles deletion of order from the order summary
+
 function handleDeleteOrder(e) {
     e.preventDefault();
 
@@ -255,7 +264,8 @@ function handleDeleteOrder(e) {
     }
 }
 
-//handles submission of order
+//this handles submission of order(s)
+
 function handleOrderSubmit() {
 
     const submitButton = document.querySelector('#checkout-Button');
