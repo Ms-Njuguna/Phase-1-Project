@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    displayBrands()
+    displayBrands();
+    createTotalRow();
 })
 
 function displayBrands () {
@@ -12,7 +13,7 @@ function displayBrands () {
     fetch(`${BASE_URL}`)
     .then(res => res.json())
     .then(products => {
-        const selectedProducts = products.filter(product => selectedBrands.includes(product.brand)).slice(0, 150);;
+        const selectedProducts = products.filter(product => selectedBrands.includes(product.brand));
         const uniqueBrands = [...new Set(selectedProducts.map(product => product.brand))];
 
         uniqueBrands.forEach(brand => {
@@ -25,6 +26,7 @@ function displayBrands () {
             })
             brandButtons.appendChild(brandButton);
         })
+        //to make sure the first brand on the brand list always displays it's products when the page is refreshed
         displayProducts(selectedProducts.filter(product => product.brand === uniqueBrands[0]));
     })
 }
@@ -71,7 +73,7 @@ function displayProducts(products) {
             ${imageAndDescription}
             <div id="product-Details">
                 <p>${product.name}</p>
-                <p>${product.price_sign} ${price}</p>
+                <p>$ ${price}</p>
             </div>
             <div id="color-Dropdown">${colorDropdown}</div>
             <button id= "buyNow-Button">Buy Now</button> 
@@ -93,6 +95,14 @@ function displayProducts(products) {
             productDescription.classList.remove('show');
             productDescription.classList.add('hidden');
         })
+
+        const buyNowButton = productCard.querySelector('#buyNow-Button');
+        buyNowButton.addEventListener('click', () => {
+            const shadeDropdown = productCard.querySelector(`#colorSelect-${product.id}`);
+            const selectedShade = shadeDropdown ? shadeDropdown.options[shadeDropdown.selectedIndex].text : 'No shade';
+
+            handleOrderSummary(product, selectedShade)
+        })
     })
 }
 
@@ -106,18 +116,56 @@ function showLoadingMessage() {
     `;
 }
 
-function showProductDescription() {
-    document.querySelectorAll('.product-card').forEach((card) => {
-        const originalHTML = card.innerHTML;
-        const description = card.dataset.description;
-        console.log(description)
+function createTotalRow() {
+    const orderTable = document.querySelector('#ordered-itemsDisplay');
+    const orderTotal = document.createElement('tr');
+    orderTotal.id = 'order-total-row'; // Assign ID for easy targeting
 
-        card.addEventListener('mouseenter', () => {
-            card.innerHTML = `<p>${description}</p>`
-        })
+    orderTotal.innerHTML = `
+        <td>
+            <span>Total</span>
+            <p>(inclusive of all taxes and fees)</p>
+        </td>
+        <td id="total-amount">$ 0.00</td>
+    `;
 
-        card.addEventListener('mouseleave', () => {
-            card.innerHTML = originalHTML;
-        })
-    })
+    orderTable.appendChild(orderTotal);
 }
+
+
+// function handleOrderSummary(product, shade) {
+
+//     const orderTable = document.querySelector('#ordered-itemsDisplay')
+
+//     const productPrice = Number(product.price);
+//     const price = productPrice.toFixed(2);
+
+//     const orderDetailsRow = document.createElement('tr')
+//     orderDetailsRow.innerHTML = `
+//         <td>${product.brand} - ${product.name} in ${shade}</td>
+//         <td>
+//             <div class="price-wrapper">
+//                 <span>$ ${price}</span>
+//                 <button class="remove-btn">
+//                     <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="black"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+//                 </button>
+//             </div>
+//         </td>
+//     `
+//     orderTable.insertBefore(orderDetailsRow, document.getElementById('order-total-row'));
+//     handleOrderTotal(price);
+// }
+
+
+// let allPrices = [];
+// function handleOrderTotal(price) {
+
+//     allPrices.push(Number(price));
+//     const total = allPrices.reduce((acc, curr) => acc + curr, 0).toFixed(2);
+
+//     const totalAmount = document.getElementById('total-amount');
+//     if (totalAmount) {
+//         totalAmount.textContent = `$ ${total}`;
+//     }
+//     return total;
+// }
