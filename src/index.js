@@ -157,15 +157,15 @@ function handleOrderSummary(product, shade) {
 }
 
 
-// let allPrices = [];
-// function handleOrderTotal(price) {
+let allPrices = [];
+function handleOrderTotal(price) {
 
-//     allPrices.push(Number(price));
-//     const total = allPrices.reduce((acc, curr) => acc + curr, 0).toFixed(2);
+    allPrices.push(Number(price));
+    const total = allPrices.reduce((acc, curr) => acc + curr, 0).toFixed(2);
 
-//     const totalAmount = document.getElementById('total-amount');
-//     if (totalAmount) {
-//         totalAmount.textContent = `$ ${total}`;
-//     }
-//     return total;
-// }
+    const totalAmount = document.getElementById('total-amount');
+    if (totalAmount) {
+        totalAmount.textContent = `$ ${total}`;
+    }
+    return total;
+}
