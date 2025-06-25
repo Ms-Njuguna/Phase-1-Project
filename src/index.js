@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 //displays make-up brands
 function displayBrands () {
-    const BASE_URL = "http://makeup-api.herokuapp.com/api/v1/products.json";
+    const BASE_URL = "https://makeup-api.herokuapp.com/api/v1/products.json";
     const brandButtons = document.querySelector('#brand-buttons');
     const selectedBrands = ['fenty', 'maybelline', 'marcelle', 'e.l.f.', 'clinique', 'glossier', 'l\'oreal'];
 
