@@ -105,6 +105,11 @@ function displayProducts(products) {
             handleOrderSummary(product, selectedShade)
         })
     })
+    
+    const brandHeading = document.getElementById('brand-heading');
+    if (brandHeading.classList.contains('hidden')) {
+        brandHeading.classList.remove('hidden');
+    }
 }
 
 function showLoadingMessage() {
