@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     displayBrands();
     createTotalRow();
+    handleOrderSubmit();
 })
 
 function displayBrands () {
@@ -170,11 +171,11 @@ function handleOrderSummary(product, shade) {
 
     const orderDetailsRow = document.createElement('tr')
     orderDetailsRow.innerHTML = `
-        <td>${product.brand} - ${product.name} in ${shade}</td>
+        <td>${product.brand}'s ${product.name} in : ${shade}</td>
         <td>
             <div class="price-wrapper">
                 <span>$ ${price}</span>
-                <button class="remove-btn">
+                <button type = "button" class="remove-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="black"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
                 </button>
             </div>
@@ -183,6 +184,9 @@ function handleOrderSummary(product, shade) {
 
     orderTable.insertBefore(orderDetailsRow, document.getElementById('order-total-row'));
     handleOrderTotal(price);
+
+    const removeButton = orderDetailsRow.querySelector('.remove-btn');
+    removeButton.addEventListener('click', handleDeleteOrder);
 
     const orderSummarySection = document.querySelector('#order-summaryDisplay');
     if (orderSummarySection.classList.contains('hidden')) {
@@ -202,4 +206,60 @@ function handleOrderTotal(price) {
         totalAmount.textContent = `$ ${total}`;
     }
     return total;
+}
+
+function handleDeleteOrder(e) {
+    e.preventDefault();
+    console.log('Deleting order....')
+
+    const rowData = e.target.closest('tr')
+
+    const priceText = rowData.querySelector('.price-wrapper span').textContent;
+    const priceValue = Number(priceText.replace('$', '').trim());
+
+    // Remove price from allPrices array (first matching one)
+    const indexToRemove = allPrices.indexOf(priceValue);
+    if (indexToRemove !== -1) {
+        allPrices.splice(indexToRemove, 1);
+    }
+
+    rowData.remove()
+
+    const newTotal = allPrices.reduce((acc, curr) => acc + curr, 0).toFixed(2);
+    document.getElementById('total-amount').textContent = `$ ${newTotal}`;
+
+    // Hide form if no items remain
+    const orderRows = document.querySelectorAll('tr:not(#order-total-row):not(#table-headers)');
+    if (orderRows.length === 0) {
+        const orderSummarySection = document.querySelector('#order-summaryDisplay');
+        orderSummarySection.classList.add('hidden');
+        allPrices = []; // Reset price state
+    }
+}
+
+function handleOrderSubmit() {
+
+    const submitButton = document.querySelector('#checkout-Button');
+    submitButton.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const userName = document.querySelector('#userName').value;
+        alert(`${userName}, you have successfully ordered your make-up products!`)
+
+        const form = document.querySelector('#order-summaryForm'); 
+        form.reset();
+
+        const orderSummarySection = document.querySelector('#order-summaryDisplay');
+        orderSummarySection.classList.add('hidden');
+
+        const rows = document.querySelectorAll(
+            '#ordered-itemsDisplay tr:not(#order-total-row):not(#table-headers)'
+        );
+        rows.forEach(row => row.remove());
+
+        // ✅ Reset total and clear prices
+        document.getElementById('total-amount').textContent = '$ 0.00';
+        allPrices = [];
+    }
+    );
 }
