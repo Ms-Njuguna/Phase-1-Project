@@ -249,7 +249,7 @@ footer #footer-info #copyright-section {
   display: flex;
   flex-direction: column;
   justify-self: center;
-  width: 600px;
+  width: 700px;
   padding: 10px 20px;
   height: fit-content;
 }
@@ -280,17 +280,57 @@ footer #footer-info #copyright-section {
 }
 
 #ordered-itemsDisplay {
-  width: 400px;
+  width: 550px;
+  table-layout: fixed;
+  border-collapse: collapse;
   justify-self: center;
   margin-top: 25px;
 } 
 
 #ordered-itemsDisplay #table-headers {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 200px;
   border-bottom: 0.3px solid #55555583;
+  width: 550px;
+}
+
+#ordered-itemsDisplay th {
+  text-align: center;
+}
+
+#ordered-itemsDisplay td {
+  text-align: center;
+}
+
+#ordered-itemsDisplay th,
+#ordered-itemsDisplay td  {
+  width: 50%;
+  padding: 10px;
+  vertical-align: top;
+}
+
+td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#ordered-itemsDisplay td:last-child,
+#ordered-itemsDisplay th:last-child {
+  width: 120px;
+}
+
+.price-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+.remove-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
 }
 
 #checkout-Button {
@@ -299,6 +339,7 @@ footer #footer-info #copyright-section {
   background-color: #555;
   color: #f7f8fb;
   text-align: center;
+  margin-left: 35px;
   margin-top: 30px;
   margin-bottom: 30px;
   width: 30%;
