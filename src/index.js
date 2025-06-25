@@ -34,7 +34,6 @@ function displayBrands () {
 
 
 function displayProducts(products) {
-    //console.log("This is the main function")
     
     const displaySection = document.querySelector('#products-byBrand')
     displaySection.innerHTML = '';
@@ -79,8 +78,6 @@ function displayProducts(products) {
                </div>
            </div>
         `;
-
-        // const priceNumber = Number(product.price);
 
         productCard.innerHTML = `
             ${imageAndDescription}
@@ -210,7 +207,6 @@ function handleOrderTotal(price) {
 
 function handleDeleteOrder(e) {
     e.preventDefault();
-    console.log('Deleting order....')
 
     const rowData = e.target.closest('tr')
 
