@@ -105,7 +105,7 @@ function displayProducts(products) {
                 `).join('')}
                 ${colorDropdownHTML}
             </div>
-            <button class="transition-all duration-300 hover:scale-105 hover:bg-black hover:text-white" id="buyNow-Button" ${isOutOfStock ? 'disabled class="inactive"' : ''}>
+            <button class="transition-all duration-300 hover:scale-105 hover:bg-black hover:text-white transition disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400" id="buyNow-Button" ${isOutOfStock ? 'disabled class="inactive"' : ''}>
                 ${isOutOfStock ? 'Unavailable' : 'Buy Now'}
             </button>
         `
