@@ -1,298 +1,321 @@
-//A web app that allows a user to see products by brand and order them a per shade preference
-//this makes sure that all DOM content is loaded before any function is run
+//creating variables to be used in varoius functions
+let allProducts = [];
+let currentPage = 1;
+const productsPerPage = 12;
+let filteredProducts = [];
+let filters = {
+  brand: "",
+  productType: "",
+  priceSort: ""
+};
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+
+
+//to make sure the DOM loads before any function runs
 document.addEventListener('DOMContentLoaded', () => {
-    displayBrands();
-    createTotalRow();
-    handleOrderSubmit();
+  fetchProducts();
+  renderCart();
+  renderPagination();
+
+  document.getElementById("brandFilter").addEventListener("change", (e) => {
+    filters.brand = e.target.value;
+    applyFilters();
+  });
+
+  document.getElementById("typeFilter").addEventListener("change", (e) => {
+    filters.productType = e.target.value;
+    applyFilters();
+  });
+
+  document.getElementById("priceSort").addEventListener("change", (e) => {
+    filters.priceSort = e.target.value;
+    applyFilters();
+  });
 })
 
-//an asynchronous function that displays the make-up brands
 
-async function displayBrands () {
-    const BASE_URL = "https://makeup-api.herokuapp.com/api/v1/products.json";
-    const brandButtons = document.querySelector('#brand-buttons');
-    const selectedBrands = ['fenty', 'maybelline', 'marcelle', 'e.l.f.', 'clinique', 'glossier', 'l\'oreal'];
 
-    //shows loading message as products are fetched
-    try {
-        showLoadingMessage();
-        const res = await fetch(BASE_URL);
-        const products = await res.json();
+//fetching products from my API
+function fetchProducts() {
+  const spinner = document.getElementById('spinner');
+  const productDisplay = document.getElementById('productDisplay');
+  const pagination = document.getElementById('pagination');
 
-        //filters through all products and return new set with specific brands I have chosen
-        const selectedProducts = products.filter(product => selectedBrands.includes(product.brand));
-        const uniqueBrands = [...new Set(selectedProducts.map(product => product.brand))];
+  // Show spinner, hide content
+  spinner.classList.remove('hidden');
+  productDisplay.innerHTML = '';
+  pagination.classList.add('hidden');
 
-        //lists product brands 
-        uniqueBrands.forEach(brand => {
-            const brandButton = document.createElement('button');
-            brandButton.innerHTML = brand.toUpperCase();
-            brandButton.className = 'brand-Button'
 
-            brandButton.addEventListener('click', () => {
-                displayProducts(selectedProducts.filter(product => product.brand === brand))
-            })
-            brandButtons.appendChild(brandButton);
-        })
 
-        //wanted to make sure the first brand on the brand list always displays it's products when the page is refreshed
-        displayProducts(selectedProducts.filter(product => product.brand === uniqueBrands[0]));
-    }catch (error) {
-        console.error("Failed to load products:", error);
-    }
+  fetch('https://makeup-api.herokuapp.com/api/v1/products.json')
+  .then(res => res.json())
+  .then(data => {
+    allProducts = data;
+
+    filteredProducts = [...data];
+
+    // Hide spinner, show products
+    spinner.classList.add('hidden');
+    pagination.classList.remove('hidden');
+
+    displayProducts(data);
+    console.log(allProducts);
+    populateBrandOptions();
+
+  })
+  .catch(error => {
+    spinner.classList.add('hidden');
+    productDisplay.innerHTML = `<p class="text-red-500">Failed to load products.</p>`;
+    console.error(error);
+  });
 }
 
-//displays products/product cards for selected brands
-
-function displayProducts(products) {
-    
-    const displaySection = document.querySelector('#products-byBrand')
-    displaySection.innerHTML = '';
-    
-    //shows maximum of 9 products per brand
-    products.slice(0, 9).forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card'
 
 
-        //checks if colour/shade is unnamed or null and render product out of stock
-        let colorDropdownHTML = '';
-        let isOutOfStock = false;
-        let price = '0.00';
+function displayProducts() {
+  const start = (currentPage - 1) * productsPerPage;
+  const end = start + productsPerPage;
+  const currentProducts = filteredProducts.slice(start, end);
 
-        const validColors = product.product_colors.filter(
-            color => color.colour_name && color.colour_name.toLowerCase() !== 'unnamed'
-        );
+  const productDisplay = document.querySelector('#productDisplay');
+  productDisplay.innerHTML = '';
 
-        if (validColors.length > 0) {
-            price = Number(product.price).toFixed(2);
-            colorDropdownHTML = `
-                <label for="colorSelect-${product.id}">Shades:</label>
-                <select id="colorSelect-${product.id}">
-                    ${validColors.map(color => `
-                       <option value="${color.hex_value}">
-                           ${color.colour_name}
-                        </option>
-                    `).join('')}
-                </select>
-            `;
-        } else {
-            colorDropdownHTML = '<p>No shades available</p>';
-            isOutOfStock = true;
-        }
+  currentProducts.forEach(product => {
+    const price = Number(product.price).toFixed(2);
 
-        //separates image and description for hover effect
-        const imageAndDescription = `
-            <div class="image-wrapper">
-                <img src="${product.image_link}" alt="${product.name}" class= "product-image" loading="lazy"
-                   onerror="this.onerror=null; this.src='https://i.pinimg.com/736x/61/8b/81/618b817cb28017dd9f174687f3987138.jpg';">
-               <div class="image-description hidden">
-                   <p>${product.description || 'No description available.'}</p>
-               </div>
-           </div>
-        `;
-
-        //product card details
-        productCard.innerHTML = `
-            ${imageAndDescription}
-            <div id="product-Details">
-                <p>${product.name}</p>
-                <p class="product-price">${isOutOfStock ? 'Out of stock' : `$ ${price}`}</p>
-            </div>
-            <div class="shade-container">
-                ${validColors.map(color => `
-                   <span class="shade" 
-                   style="background-color:${color.hex_value}" 
-                   title="${color.colour_name}">
-                   </span>
-                `).join('')}
-                ${colorDropdownHTML}
-            </div>
-            <button class="transition-all duration-300 hover:scale-105 hover:bg-black hover:text-white transition disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400" id="buyNow-Button" ${isOutOfStock ? 'disabled' : ''}>
-                ${isOutOfStock ? 'Unavailable' : 'Buy Now'}
-            </button>
-        `
-        displaySection.appendChild(productCard);
-
-        const productDescription = productCard.querySelector('.image-description')
-        const productImage = productCard.querySelector('.product-image')
-
-
-        //hover effect over image to show product description
-        //uses this instead of hovering over entire card so as to access other features i.e., dropdown and order button
-        productCard.querySelector('.image-wrapper').addEventListener('mouseenter', () => {
-            productImage.style.opacity = '0';
-            productDescription.classList.remove('hidden');
-            productDescription.classList.add('show');
-        })
-
-        productCard.querySelector('.image-wrapper').addEventListener('mouseleave',  () => {
-            productImage.style.opacity = '1';
-            productDescription.classList.remove('show');
-            productDescription.classList.add('hidden');
-        })
-
-        //order button to add order to order list/summary later
-        const buyNowButton = productCard.querySelector('#buyNow-Button');
-        buyNowButton.addEventListener('click', () => {
-
-            const shadeDropdown = productCard.querySelector(`#colorSelect-${product.id}`);
-            const selectedShade = shadeDropdown ? shadeDropdown.options[shadeDropdown.selectedIndex].text : 'No shade';
-
-            handleOrderSummary(product, selectedShade)
-        })
-    })
-
-    //to prevent heading from showing before products fully load
-    const brandHeading = document.getElementById('brand-heading');
-    if (brandHeading.classList.contains('hidden')) {
-        brandHeading.classList.remove('hidden');
-    }
-}
-
-//shows a loading message with spinning loading circle to retain the user's attention
-
-function showLoadingMessage() {
-    const displaySection = document.querySelector('#products-byBrand');
-    displaySection.innerHTML = `
-        <div class="spinner">
-            <div class="spinner-circle"></div>
-            <p>Please wait while we load the products for you...</p>
-        </div>
-    `;
-}
-
-//creates tottal row that goes at the end of products ordered table in order summary section
-
-function createTotalRow() {
-    const orderTable = document.querySelector('#ordered-itemsDisplay');
-    const orderTotal = document.createElement('tr');
-    orderTotal.id = 'order-total-row'; // Assign ID for easy targeting
-
-    orderTotal.innerHTML = `
-        <td>
-            <span>Total</span>
-            <p>(inclusive of all taxes and fees)</p>
-        </td>
-        <td id="total-amount">$ 0.00</td>
-    `;
-
-    orderTable.appendChild(orderTotal);
-}
-
-//function handles what is showed in the order summary
-
-function handleOrderSummary(product, shade) {
-
-    const orderTable = document.querySelector('#ordered-itemsDisplay')
-
-    //makes sure price is always a number with two decimal places
-    const productPrice = Number(product.price);
-    const price = productPrice.toFixed(2);
-
-    const orderDetailsRow = document.createElement('tr')
-    orderDetailsRow.innerHTML = `
-        <td>${product.brand}'s ${product.name} in : ${shade}</td>
-        <td>
-            <div class="price-wrapper">
-                <span>$ ${price}</span>
-                <button type = "button" class="remove-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="black"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
-                </button>
-            </div>
-        </td>
+    const productCard = document.createElement('div');
+    productCard.innerHTML = `
+      <img src="${product.image_link}" class="w-full h-48 object-cover rounded mb-3" onerror="this.onerror=null; this.src='./images/placeholders/${product.product_type?.toLowerCase().replace(/\s/g, '_')}.svg'" >
+      <h3 class="text-lg font-semibold">${product.name}</h3>
+      <p class="text-sm text-gray-600">${product.brand}</p>
+      <p class="text-burnt font-bold">${product.price === '0.0' ? 'Out of stock' : '$' + price}</p>
+      <button class="mt-2 bg-burnt text-cream px-3 py-1 rounded add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
     `
+    productDisplay.appendChild(productCard)
+  })
 
-    orderTable.insertBefore(orderDetailsRow, document.getElementById('order-total-row'));
-    handleOrderTotal(price);
-
-    //event listener for removing order from summary of orders
-    const removeButton = orderDetailsRow.querySelector('.remove-btn');
-    removeButton.addEventListener('click', handleDeleteOrder);
-
-    const orderSummarySection = document.querySelector('#order-summaryDisplay');
-    if (orderSummarySection.classList.contains('hidden')) {
-        orderSummarySection.classList.remove('hidden');
-    }
+  document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+  button.addEventListener('click', (e) => {
+    const id = e.target.dataset.id;
+    const productToAdd = allProducts.find(p => p.id == id);
+    addToCart(productToAdd);
+  });
+});
 }
 
-//this handles the total price of products ordered
 
-let allPrices = [];
-function handleOrderTotal(price) {
 
-    //calculates total of all prices of all products ordered
-    allPrices.push(Number(price));
-    const total = allPrices.reduce((acc, curr) => acc + curr, 0).toFixed(2);
+function renderPagination() {
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
 
-    const totalAmount = document.getElementById('total-amount');
-    if (totalAmount) {
-        totalAmount.textContent = `$ ${total}`;
-    }
-    return total;
+  // Prev Button
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "Prev";
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.className = `px-4 py-2 mx-1 rounded border border-[#CC5500] text-[#CC5500] hover:bg-[#CC5500] hover:text-white disabled:opacity-40`;
+  prevBtn.addEventListener("click", () => {
+    currentPage--;
+    displayProducts();
+    renderPagination();
+  });
+  pagination.appendChild(prevBtn);
+
+  // Determine visible page range
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, currentPage + 2);
+
+  if (currentPage <= 3) {
+    endPage = Math.min(5, totalPages);
+  } else if (currentPage >= totalPages - 2) {
+    startPage = Math.max(1, totalPages - 4);
+  }
+
+  // First page + ellipsis
+  if (startPage > 1) {
+    appendPageBtn(1);
+    appendEllipsis();
+  }
+
+  // Page buttons
+  for (let i = startPage; i <= endPage; i++) {
+    appendPageBtn(i);
+  }
+
+  // Last page + ellipsis
+  if (endPage < totalPages) {
+    appendEllipsis();
+    appendPageBtn(totalPages);
+  }
+
+  // Next Button
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Next";
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.className = `px-4 py-2 mx-1 rounded border border-[#CC5500] text-[#CC5500] hover:bg-[#CC5500] hover:text-white disabled:opacity-40`;
+  nextBtn.addEventListener("click", () => {
+    currentPage++;
+    displayProducts();
+    renderPagination();
+  });
+  pagination.appendChild(nextBtn);
+ 
 }
 
-//this handles deletion of order from the order summary
 
-function handleDeleteOrder(e) {
-    e.preventDefault();
+// Helper functions
+function appendPageBtn(i) {
+  const pageBtn = document.createElement("button");
+  pageBtn.textContent = i;
+  pageBtn.className = `px-3 py-1 mx-1 rounded border ${
+    i === currentPage ? "bg-[#CC5500] text-white" : "text-[#CC5500] border-[#CC5500]"
+    } hover:bg-[#CC5500] hover:text-white transition
+  `;
 
-    const rowData = e.target.closest('tr')
+  pageBtn.addEventListener("click", () => {
+    currentPage = i;
+    displayProducts();
+    renderPagination();
+  });
 
-    const priceText = rowData.querySelector('.price-wrapper span').textContent;
-    const priceValue = Number(priceText.replace('$', '').trim());
-
-    // Removes price from allPrices array (first matching one)
-    const indexToRemove = allPrices.indexOf(priceValue);
-    if (indexToRemove !== -1) {
-        allPrices.splice(indexToRemove, 1);
-    }
-
-    rowData.remove()
-
-    //recalculates order total once product ordered is deleted
-    const newTotal = allPrices.reduce((acc, curr) => acc + curr, 0).toFixed(2);
-    document.getElementById('total-amount').textContent = `$ ${newTotal}`;
-
-    // Hides order summary form if all products are deleted
-    const orderRows = document.querySelectorAll('tr:not(#order-total-row):not(#table-headers)');
-    if (orderRows.length === 0) {
-        const orderSummarySection = document.querySelector('#order-summaryDisplay');
-        orderSummarySection.classList.add('hidden');
-        allPrices = []; // Reset price state
-    }
+  pagination.appendChild(pageBtn);
 }
 
-//this handles submission of order(s)
 
-function handleOrderSubmit() {
 
-    const submitButton = document.querySelector('#checkout-Button');
-    submitButton.addEventListener('click', (e) => {
-        //to prevent default form behaviour
-        e.preventDefault();
-
-        //to access user name value entered
-        const userName = document.querySelector('#userName').value;
-        alert(`${userName}, you have successfully ordered your make-up products!`)
-
-        //resets the order summary form when order is submitted
-        const form = document.querySelector('#order-summaryForm'); 
-        form.reset();
-
-        //hides the order summary form
-        const orderSummarySection = document.querySelector('#order-summaryDisplay');
-        orderSummarySection.classList.add('hidden');
-
-        const rows = document.querySelectorAll(
-            '#ordered-itemsDisplay tr:not(#order-total-row):not(#table-headers)'
-        );
-        rows.forEach(row => row.remove());
-
-        //Resets total and clear prices
-        document.getElementById('total-amount').textContent = '$ 0.00';
-        allPrices = [];
-    }
-    );
+function appendEllipsis() {
+  const dots = document.createElement("span");
+  dots.textContent = "...";
+  dots.className = "mx-2 text-gray-500";
+  pagination.appendChild(dots);
 }
+
+
+
+function applyFilters() {
+  let filtered = [...allProducts];
+
+  // Filter by brand
+  if (filters.brand) {
+    filtered = filtered.filter(p => p.brand?.toLowerCase() === filters.brand.toLowerCase());
+  }
+
+  // Filter by product_type
+  if (filters.productType) {
+    filtered = filtered.filter(p => p.product_type?.toLowerCase() === filters.productType.toLowerCase());
+  }
+
+  // Sort by price
+  if (filters.priceSort === "high") {
+    filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+  } else if (filters.priceSort === "low") {
+    filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+  }
+
+  // Update pagination
+  currentPage = 1;
+  filteredProducts = filtered;
+  displayProducts();
+  renderPagination();
+}
+
+
+function populateBrandOptions() {
+  const brandSet = new Set(allProducts.map(p => p.brand).filter(Boolean));
+  const brandSelect = document.getElementById("brandFilter");
+
+  brandSet.forEach(brand => {
+    const option = document.createElement("option");
+    option.value = brand;
+    option.textContent = capitalize(brand);
+    brandSelect.appendChild(option);
+  });
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+
+function addToCart(product) {
+  const existingItem = cart.find(item => item.id === product.id);
+
+  if (existingItem) {
+    existingItem.quantity++;
+  } else {
+    cart.push({ ...product, quantity: 1 });
+  }
+
+  saveCart();
+  renderCart(); // optional if you want live updates
+  updateCartCount();
+}
+
+
+function saveCart() {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function toggleCart() {
+  const cartPanel = document.getElementById("cartPanel");
+  cartPanel.classList.toggle("translate-x-full");
+}
+
+function updateCartCount() {
+  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+  document.getElementById("cartCount").textContent = count;
+}
+
+function renderCart() {
+  const cartItemsContainer = document.getElementById('cartItems');
+
+  cartItemsContainer.innerHTML = '';
+
+  cart.forEach(item => {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'mb-4 border-b pb-2';
+    itemDiv.innerHTML = `
+      <p class="font-semibold">${item.name}</p>
+      <p>$${item.price} × ${item.quantity}</p>
+      <div class="flex gap-2 mt-1">
+        <button onclick="changeQty(${item.id}, 1)" class="bg-green-500 text-white px-2 rounded">+</button>
+        <button onclick="changeQty(${item.id}, -1)" class="bg-red-500 text-white px-2 rounded">-</button>
+        <button onclick="removeFromCart(${item.id})" class="bg-gray-400 text-white px-2 rounded">Remove</button>
+      </div>
+    `;
+    cartItemsContainer.appendChild(itemDiv);
+  });
+
+  updateCartCount();
+  const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+  const totalDiv = document.querySelector('#cartTotal');
+  totalDiv.textContent = `${total.toFixed(2)}`;
+
+}
+
+
+function changeQty(id, amount) {
+  const item = cart.find(p => p.id === id);
+  if (!item) return;
+
+  item.quantity += amount;
+
+  if (item.quantity <= 0) {
+    cart = cart.filter(p => p.id !== id);
+  }
+
+  saveCart();
+  renderCart();
+  updateCartCount();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(p => p.id !== id);
+  saveCart();
+  renderCart();
+  updateCartCount();
+}
+

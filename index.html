@@ -2,69 +2,143 @@
 
 <html>
     <head>
-        <meta charset="UTF-8"> <!-- Sets character encoding to UTF-8 -->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes the site responsive -->
-        <meta http-equiv="X-UA-Compatible" content="IE=edge"> <!-- Ensures compatibility with Internet Explorer -->
-        <link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="40x40" href="./images/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="20x20" href="./images/favicon-16x16.png">
-        <link rel="manifest" href="./images/site.webmanifest">
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
         <link rel="stylesheet" href="./css/styles.css" />
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="./src/index.js"></script>
-        <title>The Beauty Edit</title>
+        <title>Verdara</title>
     </head>
     <body>
         <header>
-            <nav>
-                <ul>
-                    <li><a href="#hero-section">Home</a></li>
-                    <li><a href="#products-display">Products</a></li>
-                    <li><a href="#order-summaryDisplay">Orders</a></li>
+            <nav class="bg-[#FDFBF9] px-60 pt-1 pb-1 flex justify-between items-center shadow-[0_4px_10px_rgba(0,0,0,0.05)] fixed top-0 left-0 right-0 z-50">
+                <img src="./images/VERDARA.svg" alt="logo" class="w-24 h-24 ">
+                <ul class="md:flex gap-10 font-body text-black">
+                    <li class="hover:text-[#A8BBA2] cursor-pointer">Home</li>
+                    <li class="hover:text-[#A8BBA2] cursor-pointer">Shop All</li>
+                    <li class="hover:text-[#A8BBA2] cursor-pointer">Brands</li>
+                    <li class="hover:text-[#A8BBA2] cursor-pointer">About</li>
                 </ul>
+                <div class="relative cursor-pointer" onclick="toggleCart()">
+                    <span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/></svg></span>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-[#FDFBF9] text-[#CC5500] border border-[olive] rounded-full text-xs px-1">0</span>
+                </div>
             </nav>
-            <div id="hero-section">
-                <img id="header-logo" src="./images/The Beauty Edit (2).svg">
-                <img id="header-model-image" src="./images/Header-Image-Makeup .svg">
-            </div>
         </header>
         <main>
-            <section id="products-display">
-                <div id="brands-list">
-                    <h3 id="brand-heading" class="hidden">View Products by brand</h3>
-                    <ul id="brand-buttons"></ul>
+            <section class="bg-[#FDFBF9]  flex items-center justify-center px-4 md:px-50 py-60 pb-16 pt-44">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-6xl w-full">
+    
+                    <!-- Hero Section Text Content -->
+                    <div class="space-y-6">
+                        <h1 class="text-5xl md:text-6xl font-bold text-[#CC5500] leading-tight">
+                           Verdara
+                        </h1>
+                        <p class="text-lg text-[#8B6B5C] max-w-lg">
+                            Discover a curated collection of makeup essentials from top-tier brands — where earth tones meet glam.
+                        </p>
+                        <div class="flex gap-4">
+                            <button class="bg-[#CC5500] text-[#FDFBF9] px-6 py-3 rounded-full hover:bg-[#D4A5A5] transition">
+                                Shop Now
+                            </button>
+                            <button class="border border-burnt text-[#CC5500] px-6 py-3 rounded-full hover:bg-[#CC5500] hover:text-[#FDFBF9] transition">
+                                Browse Brands
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hero Section Image -->
+                    <div class="relative w-full h-[400px]">
+                        <img
+                        src="./images/Verdara-heroImage.svg"
+                        alt="Makeup Collection"
+                        class="object-cover w-full h-full rounded-2xl shadow-lg"
+                        />
+                    </div>
                 </div>
-                <div id="products-byBrand" class="transition-shadow duration-300 hover:shadow-lg"></div>
             </section>
-            <section id="order-summaryDisplay" class="hidden">
-                <form id="order-summaryForm">
-                    <div id="order-summaryFormHeading">
-                        <h3>ORDER SUMMARY</h3>
-                    </div>
-                    <div id="order-summaryFormInputs">
-                        <input id="userName" type="text" placeholder="Name ..." required>
-                        <input id="userEmail" type="email" placeholder="Email ..." required>
-                    </div>
-                    <div>
-                        <table id="ordered-itemsDisplay">
-                            <tr id="table-headers">
-                                <th>Orders</th>
-                                <th>Price</th>
-                            </tr>
-                        </table>
-                    </div>
-                    <button type="button" id="checkout-Button">Checkout</button>
-                </form>
+            <section class="bg-[#8B6B5C] py-12 px-4 md:px-16 shadow-[0_10px_15px_-5px_rgba(0,0,0,0.3)] z-50 relative">
+                <h2 class="text-4xl font-glamour text-[#FDFBF9] mb-8 text-center font-bold">Explore Our Products</h2>
+
+                <div class="w-full max-w-6xl mx-auto px-4 flex justify-center flex-col sm:flex-row gap-4 mb-6">
+                    <!-- Brand Filter -->
+                    <select id="brandFilter" class="border p-2 rounded w-full sm:w-auto">
+                        <option value="">All Brands</option>
+                        <!-- Dynamically add brand options -->
+                    </select>
+
+                    <!-- Product Type Filter -->
+                    <select id="typeFilter" class="border p-2 rounded w-full sm:w-auto">
+                        <option value="">All Types</option>
+                        <option value="lipstick">Lipstick</option>
+                        <option value="eyeliner">Eyeliner</option>
+                        <option value="foundation">Foundation</option>
+                        <option value="nail_polish">Nail Polish</option>
+                        <option value="blush">Blush</option>
+                        <option value="bronzer">Bronzer</option>
+                        <option value="pencil">Pencil</option>
+                        <option value="eyeshadow">Eyeshadow</option>
+                        <option value="eyebrow">Eyebrow</option>
+                    </select>
+
+                    <!-- Price Sort Filter -->
+                    <select id="priceSort" class="border p-2 rounded w-full sm:w-auto">
+                        <option value="">Sort by Price</option>
+                        <option value="high">Highest to Lowest</option>
+                        <option value="low">Lowest to Highest</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 justify-center sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto" id="productDisplay"></div>
+
+                <div id="spinner" class="hidden flex justify-center items-center h-16">
+                    <div class="w-8 h-8 border-4 border-[#CC5500] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+
+                <div id="pagination" class="flex justify-center mt-8 gap-2"></div>
             </section>
         </main>
-        <footer>
-            <div id="footer-info">
-                <img id="footer-logo" src="./images/The Beauty Edit (2).svg" alt="footer logo">
-                <div id="copyright-section">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#f7f8fb"><path d="M400-320h160q17 0 28.5-11.5T600-360v-80h-80v40h-80v-160h80v40h80v-80q0-17-11.5-28.5T560-640H400q-17 0-28.5 11.5T360-600v240q0 17 11.5 28.5T400-320Zm80 240q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
-                    <p>The Beauty Edit</p>
+        <footer class="bg-[#FDFBF9] text-[#403f3f] border-t border-[#dcdcdc] ">
+            <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-start gap-10">
+                <!-- Brand -->
+                <div>
+                    <img src="./images/VERDARA.svg" alt="logo" class="w-24 h-24 ">
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-md font-semibold mb-2">Contact</h3>
+                    <ul class="space-y-1 text-sm">
+                        <li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/></svg> <a href="mailto:support@glowlab.com" class="hover:text-[#CC5500]">support@verdara.com</a></li>
+                        <li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="#000" class="bi bi-instagram" viewBox="0 0 16 16"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/></svg> <a href="#" class="hover:text-[#CC5500]">@verdara_beauty</a></li>
+                    </ul>
                 </div>
             </div>
+
+            <div class="border-t border-[#eaeaea] mt-6 text-center text-sm py-4 text-gray-500">
+                © 2025 Verdara. All rights reserved.
+            </div>
         </footer>
+
+        <!-- CART SIDEBAR -->
+        <div id="cartPanel" class="fixed top-0 right-0 w-80 h-full bg-[#FDFBF9] shadow-lg p-4 overflow-y-auto transition-transform transform translate-x-full z-50">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Your Cart</h2>
+                <button onclick="toggleCart()" class="text-lg font-bold text-[#CC5500]">&times;</button>
+            </div>
+
+            <div id="cartItems" class="space-y-4"></div>
+
+            <div class="mt-6 border-t pt-4">
+                <p class="font-semibold text-[#CC5500] text-lg">
+                    Total: $<span id="cartTotal">0.00</span>
+                </p>
+                <button class="mt-4 w-full bg-[#CC5500] text-white py-2 rounded hover:bg-[#D97D0D] transition">
+                    Checkout
+                </button>
+            </div>
+        </div>
+
     </body>
 </html>
