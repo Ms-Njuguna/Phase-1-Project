@@ -17,17 +17,22 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchProducts();
   renderCart();
   renderPagination();
+  handleTotal();
+  handleCheckout();
 
+  //event listener for the filter by brand
   document.getElementById("brandFilter").addEventListener("change", (e) => {
     filters.brand = e.target.value;
     applyFilters();
   });
 
+  //event listener for the filter by product type
   document.getElementById("typeFilter").addEventListener("change", (e) => {
     filters.productType = e.target.value;
     applyFilters();
   });
 
+  //event listener for the filter by price
   document.getElementById("priceSort").addEventListener("change", (e) => {
     filters.priceSort = e.target.value;
     applyFilters();
@@ -42,7 +47,7 @@ function fetchProducts() {
   const productDisplay = document.getElementById('productDisplay');
   const pagination = document.getElementById('pagination');
 
-  // Show spinner, hide content
+  // Shows the spinner, and hides the pagination buttons until the product cards are fully loaded
   spinner.classList.remove('hidden');
   productDisplay.innerHTML = '';
   pagination.classList.add('hidden');
@@ -56,7 +61,7 @@ function fetchProducts() {
 
     filteredProducts = [...data];
 
-    // Hide spinner, show products
+    // Hides the spinner, shows the pagination buttons
     spinner.classList.add('hidden');
     pagination.classList.remove('hidden');
 
@@ -66,15 +71,17 @@ function fetchProducts() {
 
   })
   .catch(error => {
+    //incase the fetch fails, a message is displayed
     spinner.classList.add('hidden');
-    productDisplay.innerHTML = `<p class="text-red-500">Failed to load products.</p>`;
+    productDisplay.innerHTML = `<p class="text-red-500 text-center">Failed to load products.</p>`;
     console.error(error);
   });
 }
 
 
-
+//displays the products fetched from the API
 function displayProducts() {
+  //to display a certain number of products per page for pagination logic
   const start = (currentPage - 1) * productsPerPage;
   const end = start + productsPerPage;
   const currentProducts = filteredProducts.slice(start, end);
@@ -82,41 +89,43 @@ function displayProducts() {
   const productDisplay = document.querySelector('#productDisplay');
   productDisplay.innerHTML = '';
 
+  //product card content from fetched data
   currentProducts.forEach(product => {
     const price = Number(product.price).toFixed(2);
+    const isOutOfStock = price === '0.00';
 
     const productCard = document.createElement('div');
     productCard.innerHTML = `
       <img src="${product.image_link}" class="w-full h-48 object-cover rounded mb-3" onerror="this.onerror=null; this.src='./images/placeholders/${product.product_type?.toLowerCase().replace(/\s/g, '_')}.svg'" >
       <h3 class="text-lg font-semibold">${product.name}</h3>
-      <p class="text-sm text-gray-600">${product.brand}</p>
-      <p class="text-burnt font-bold">${product.price === '0.0' ? 'Out of stock' : '$' + price}</p>
-      <button class="mt-2 bg-burnt text-cream px-3 py-1 rounded add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+      <p class="text-sm text-black">${product.brand}</p>
+      <p class="text-[#FDFBF9] font-bold">${isOutOfStock ? 'Out of stock' : '$' + price}</p>
+      <button class="mt-2 bg-[#CC5500] ${isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#CC5500] hover:bg-[#b44900]'} text-[#FDFBF9] px-3 py-1 rounded add-to-cart-btn" data-id="${product.id}">${isOutOfStock ? 'Unavailable' : 'Add to Cart'}</button>
     `
     productDisplay.appendChild(productCard)
   })
 
-  document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-  button.addEventListener('click', (e) => {
-    const id = e.target.dataset.id;
-    const productToAdd = allProducts.find(p => p.id == id);
-    addToCart(productToAdd);
+  //add to cart button event listener
+  document.querySelectorAll('.add-to-cart-btn:not([disabled])').forEach(button => {
+    button.addEventListener('click', (e) => {
+      const id = e.target.dataset.id;
+      const productToAdd = allProducts.find(product => product.id == id);
+      addToCart(productToAdd);
+    });
   });
-});
 }
 
-
-
+//makes sure that the products are sectioned into pages so as to not overwhelm the user
 function renderPagination() {
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const pagination = document.getElementById("pagination");
   pagination.innerHTML = "";
 
-  // Prev Button
+  // Previous page Button
   const prevBtn = document.createElement("button");
   prevBtn.textContent = "Prev";
   prevBtn.disabled = currentPage === 1;
-  prevBtn.className = `px-4 py-2 mx-1 rounded border border-[#CC5500] text-[#CC5500] hover:bg-[#CC5500] hover:text-white disabled:opacity-40`;
+  prevBtn.className = `px-4 py-2 mx-1 rounded border border-[#CC5500] text-[#CC5500] bg-[#FDFBF9] hover:bg-[#CC5500] hover:text-white disabled:opacity-40 shadow-sm`;
   prevBtn.addEventListener("click", () => {
     currentPage--;
     displayProducts();
@@ -124,7 +133,7 @@ function renderPagination() {
   });
   pagination.appendChild(prevBtn);
 
-  // Determine visible page range
+  // Determines the visible page range
   let startPage = Math.max(1, currentPage - 2);
   let endPage = Math.min(totalPages, currentPage + 2);
 
@@ -134,7 +143,7 @@ function renderPagination() {
     startPage = Math.max(1, totalPages - 4);
   }
 
-  // First page + ellipsis
+  // shows the First page + ellipsis
   if (startPage > 1) {
     appendPageBtn(1);
     appendEllipsis();
@@ -145,17 +154,17 @@ function renderPagination() {
     appendPageBtn(i);
   }
 
-  // Last page + ellipsis
+  // shows the Last page + ellipsis
   if (endPage < totalPages) {
     appendEllipsis();
     appendPageBtn(totalPages);
   }
 
-  // Next Button
+  // the Next page Button
   const nextBtn = document.createElement("button");
   nextBtn.textContent = "Next";
   nextBtn.disabled = currentPage === totalPages;
-  nextBtn.className = `px-4 py-2 mx-1 rounded border border-[#CC5500] text-[#CC5500] hover:bg-[#CC5500] hover:text-white disabled:opacity-40`;
+  nextBtn.className = `px-4 py-2 mx-1 rounded border border-[#CC5500] text-[#CC5500] bg-[#FDFBF9] hover:bg-[#CC5500] hover:text-white disabled:opacity-40 shadow-sm`;
   nextBtn.addEventListener("click", () => {
     currentPage++;
     displayProducts();
@@ -166,12 +175,12 @@ function renderPagination() {
 }
 
 
-// Helper functions
+//a helper function to append the current page button and display the products for the particular page button
 function appendPageBtn(i) {
   const pageBtn = document.createElement("button");
   pageBtn.textContent = i;
   pageBtn.className = `px-3 py-1 mx-1 rounded border ${
-    i === currentPage ? "bg-[#CC5500] text-white" : "text-[#CC5500] border-[#CC5500]"
+    i === currentPage ? "bg-[#CC5500] text-white shadow-md" : "text-[#FDFBF9] border-[#CC5500] shadow-md"
     } hover:bg-[#CC5500] hover:text-white transition
   `;
 
@@ -184,8 +193,7 @@ function appendPageBtn(i) {
   pagination.appendChild(pageBtn);
 }
 
-
-
+//shows an ellipsis for other page buttons so that not all are displayed at once on the page
 function appendEllipsis() {
   const dots = document.createElement("span");
   dots.textContent = "...";
@@ -193,36 +201,35 @@ function appendEllipsis() {
   pagination.appendChild(dots);
 }
 
-
-
+//handles the filtering logic of the products based on brand, product type and price
 function applyFilters() {
   let filtered = [...allProducts];
 
-  // Filter by brand
+  // Filters products by brand
   if (filters.brand) {
     filtered = filtered.filter(p => p.brand?.toLowerCase() === filters.brand.toLowerCase());
   }
 
-  // Filter by product_type
+  // Filters products by product_type
   if (filters.productType) {
     filtered = filtered.filter(p => p.product_type?.toLowerCase() === filters.productType.toLowerCase());
   }
 
-  // Sort by price
+  // Sorts products by price
   if (filters.priceSort === "high") {
     filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
   } else if (filters.priceSort === "low") {
     filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
   }
 
-  // Update pagination
+  // Updates the pagination buttons based on how many products are displayed after filters are applied
   currentPage = 1;
   filteredProducts = filtered;
   displayProducts();
   renderPagination();
 }
 
-
+//creates a set of all products ,filters them based on each brand and displays the brands as options in the filter by brand section
 function populateBrandOptions() {
   const brandSet = new Set(allProducts.map(p => p.brand).filter(Boolean));
   const brandSelect = document.getElementById("brandFilter");
@@ -235,11 +242,12 @@ function populateBrandOptions() {
   });
 }
 
+//capitalizes the first letter of each brand in the options to filter section
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-
+//this handles when the user adds a product to the cart by clicking the add to cart button and staes initial quantity as one 
 function addToCart(product) {
   const existingItem = cart.find(item => item.id === product.id);
 
@@ -254,21 +262,24 @@ function addToCart(product) {
   updateCartCount();
 }
 
-
+//this makes sure that the data in the cart is saved in local storage 
 function saveCart() {
   localStorage.setItem('cart', JSON.stringify(cart));
 }
 
+//this makes sure that the cart stays hidden on page load until the user clicks on the cart icon
 function toggleCart() {
   const cartPanel = document.getElementById("cartPanel");
   cartPanel.classList.toggle("translate-x-full");
 }
 
+//this updates the counter that shows above the cart icon and makes sure it tracks whether an item was added or removed 
 function updateCartCount() {
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
   document.getElementById("cartCount").textContent = count;
 }
 
+//handles what is displayed in the cart and updates based on various changes
 function renderCart() {
   const cartItemsContainer = document.getElementById('cartItems');
 
@@ -277,9 +288,10 @@ function renderCart() {
   cart.forEach(item => {
     const itemDiv = document.createElement('div');
     itemDiv.className = 'mb-4 border-b pb-2';
+    const itemPrice = Number(item.price).toFixed(2);
     itemDiv.innerHTML = `
-      <p class="font-semibold">${item.name}</p>
-      <p>$${item.price} × ${item.quantity}</p>
+      <p class="font-semibold">${item.brand} - ${item.name}</p>
+      <p>$${itemPrice} × ${item.quantity}</p>
       <div class="flex gap-2 mt-1">
         <button onclick="changeQty(${item.id}, 1)" class="bg-green-500 text-white px-2 rounded">+</button>
         <button onclick="changeQty(${item.id}, -1)" class="bg-red-500 text-white px-2 rounded">-</button>
@@ -290,13 +302,18 @@ function renderCart() {
   });
 
   updateCartCount();
-  const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-  const totalDiv = document.querySelector('#cartTotal');
-  totalDiv.textContent = `${total.toFixed(2)}`;
+  handleTotal();
 
 }
 
+//calculates the total price of all products in the cart and makes sure it displays with 2 decimal places
+function handleTotal() {
+  const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+  const totalDiv = document.querySelector('#cartTotal');
+  totalDiv.textContent = `${total.toFixed(2)}`;
+}
 
+//enables the user to add or reduce the quantity of a particular product in the cart
 function changeQty(id, amount) {
   const item = cart.find(p => p.id === id);
   if (!item) return;
@@ -312,6 +329,7 @@ function changeQty(id, amount) {
   updateCartCount();
 }
 
+//when a user clicks the remove button next to a product, that specific product is removed from the cart and updates the info in the cart
 function removeFromCart(id) {
   cart = cart.filter(p => p.id !== id);
   saveCart();
@@ -319,3 +337,22 @@ function removeFromCart(id) {
   updateCartCount();
 }
 
+//handles the checkout of products
+function handleCheckout() {
+  const checkoutButton = document.getElementById('checkoutBtn');
+  checkoutButton.addEventListener('click', () => {
+    // Clears the cart array
+    cart = [];
+
+    // Removes the data stored from local storage
+    localStorage.removeItem('cart');
+
+    // Updates the cart UI
+    renderCart();
+    updateCartCount();
+    handleTotal();
+
+    //shows a confirmation message after checkout
+    alert("Thank you for your purchase!");
+  })
+}

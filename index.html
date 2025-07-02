@@ -15,10 +15,10 @@
             <nav class="bg-[#FDFBF9] px-60 pt-1 pb-1 flex justify-between items-center shadow-[0_4px_10px_rgba(0,0,0,0.05)] fixed top-0 left-0 right-0 z-50">
                 <img src="./images/VERDARA.svg" alt="logo" class="w-24 h-24 ">
                 <ul class="md:flex gap-10 font-body text-black">
-                    <li class="hover:text-[#A8BBA2] cursor-pointer">Home</li>
-                    <li class="hover:text-[#A8BBA2] cursor-pointer">Shop All</li>
-                    <li class="hover:text-[#A8BBA2] cursor-pointer">Brands</li>
-                    <li class="hover:text-[#A8BBA2] cursor-pointer">About</li>
+                    <li class="hover:text-[#A8BBA2] cursor-pointer"><a href="#">Home</a></li>
+                    <li class="hover:text-[#A8BBA2] cursor-pointer"><a href="#productDisplay">Shop All</a></li>
+                    <li class="hover:text-[#A8BBA2] cursor-pointer"><a href="#productDisplay">Brands</a></li>
+                    <li class="hover:text-[#A8BBA2] cursor-pointer"><a href="#heroSection">About</a></li>
                 </ul>
                 <div class="relative cursor-pointer" onclick="toggleCart()">
                     <span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/></svg></span>
@@ -28,7 +28,7 @@
         </header>
         <main>
             <section class="bg-[#FDFBF9]  flex items-center justify-center px-4 md:px-50 py-60 pb-16 pt-44">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-6xl w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-6xl w-full" id="heroSection">
     
                     <!-- Hero Section Text Content -->
                     <div class="space-y-6">
@@ -39,10 +39,10 @@
                             Discover a curated collection of makeup essentials from top-tier brands — where earth tones meet glam.
                         </p>
                         <div class="flex gap-4">
-                            <button class="bg-[#CC5500] text-[#FDFBF9] px-6 py-3 rounded-full hover:bg-[#D4A5A5] transition">
+                            <button class="bg-[#CC5500] text-[#FDFBF9] px-6 py-3 rounded-full hover:bg-[#D4A5A5] transition" onclick="document.getElementById('productDisplay').scrollIntoView({ behavior: 'smooth' })">
                                 Shop Now
                             </button>
-                            <button class="border border-burnt text-[#CC5500] px-6 py-3 rounded-full hover:bg-[#CC5500] hover:text-[#FDFBF9] transition">
+                            <button class="border border-burnt text-[#CC5500] px-6 py-3 rounded-full hover:bg-[#CC5500] hover:text-[#FDFBF9] transition" onclick="document.getElementById('productDisplay').scrollIntoView({ behavior: 'smooth' })">
                                 Browse Brands
                             </button>
                         </div>
@@ -134,7 +134,7 @@
                 <p class="font-semibold text-[#CC5500] text-lg">
                     Total: $<span id="cartTotal">0.00</span>
                 </p>
-                <button class="mt-4 w-full bg-[#CC5500] text-white py-2 rounded hover:bg-[#D97D0D] transition">
+                <button class="mt-4 w-full bg-[#CC5500] text-white py-2 rounded hover:bg-[#D97D0D] transition" id="checkoutBtn">
                     Checkout
                 </button>
             </div>
